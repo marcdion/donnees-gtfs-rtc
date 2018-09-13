@@ -1,0 +1,4 @@
+/home/etudiant/Bureau/tp1_clion/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/etudiant/Bureau/tp1_clion/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/etudiant/Bureau/tp1_clion/cmake-build-debug/CMakeFiles/main.dir
+/home/etudiant/Bureau/tp1_clion/cmake-build-debug/CMakeFiles/TP1.dir
