@@ -38,15 +38,40 @@ vector<string> DonneesGTFS::string_to_vector(const string &s, char delim)
 void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 {
     // declaration de la variable de type fstream
-    fstream fichierRoutes;
+    std::fstream fichierRoutes;
 
     // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
-    fichierRoutes.open(p_nomFichier.c_str(), ios :: in || ios :: binary);
+    fichierRoutes.open(p_nomFichier, ios_base :: in);
     if (!fichierRoutes.fail()){
+        string strUneLigne;
+        string delim = ",";
+        vector<string> vLigne;
 
+        unsigned int uiRouteId;
+
+        string sRouteShortName;
+        string sRouteDesc;
+        CategorieBus sRouteType;
+
+        getline(fichierRoutes, strUneLigne);
+        while(getline(fichierRoutes, strUneLigne)){
+            vLigne = string_to_vector(strUneLigne, *delim.c_str());
+            uiRouteId = (unsigned int) stoi(vLigne[0]);
+            sRouteShortName = vLigne[2];
+            sRouteShortName = sRouteShortName.substr(1, sRouteShortName.size() - 2);
+
+            sRouteDesc = vLigne[4];
+            sRouteDesc = sRouteDesc.substr(1, sRouteDesc.size() - 2);
+            sRouteType = Ligne::couleurToCategorie(vLigne[7]);
+
+            Ligne *uneLigne = new Ligne(uiRouteId, sRouteShortName, sRouteDesc, sRouteType);
+            m_lignes[uneLigne->getId()] = *uneLigne;
+            m_lignes_par_numero.insert({uneLigne->getNumero(), *uneLigne});
+        }
+        fichierRoutes.close();
+    }else{
         fichierRoutes.close();
     }
-
 }
 
 //! \brief ajoute les stations dans l'objet GTFS
@@ -54,6 +79,39 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 {
+    // declaration de la variable de type fstream
+    std::fstream fichierStations;
+
+    // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
+    fichierStations.open(p_nomFichier, ios_base :: in);
+    if (!fichierStations.fail()){
+        string strUneStation;
+        string delim = ",";
+        vector<string> vStation;
+
+        unsigned int iStationId;
+
+        string sStationNom;
+        string sStationDescription;
+
+        getline(fichierStations, strUneStation);
+        while(getline(fichierStations, strUneStation)){
+            vStation = string_to_vector(strUneStation, *delim.c_str());
+            iStationId = (unsigned int) stoi(vStation[0]);
+            sStationNom = vStation[1];
+            sStationNom.erase(sStationNom.begin(), sStationNom.end());
+
+            sStationDescription = vStation[2];
+            sStationDescription.erase(sStationDescription.begin(), sStationDescription.end());
+
+            Coordonnees *cStationCoordonees = new Coordonnees(stoi(vStation[3]), stoi(vStation[4]));
+            Station *uneStation = new Station(iStationId, sStationNom, sStationDescription, *cStationCoordonees);
+        }
+
+        fichierStations.close();
+    }else{
+        fichierStations.close();
+    }
 }
 
 //! \brief ajoute les transferts dans l'objet GTFS
@@ -64,6 +122,7 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 //! \throws logic_error si tous les arrets de la date et de l'intervalle n'ont pas été ajoutés
 void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 {
+
 }
 
 
@@ -72,6 +131,7 @@ void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
 {
+
 }
 
 //! \brief ajoute les voyages de la date
@@ -80,6 +140,7 @@ void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 {
+
 }
 
 //! \brief ajoute les arrets aux voyages présents dans le GTFS si l'heure du voyage appartient à l'intervalle de temps du GTFS
@@ -90,6 +151,7 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichier)
 {
+
 }
 
 unsigned int DonneesGTFS::getNbArrets() const
