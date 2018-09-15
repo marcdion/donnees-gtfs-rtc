@@ -65,7 +65,7 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
             sRouteType = Ligne::couleurToCategorie(vLigne[7]);
 
             Ligne *uneLigne = new Ligne(uiRouteId, sRouteShortName, sRouteDesc, sRouteType);
-            m_lignes[uneLigne->getId()] = *uneLigne;
+            m_lignes.insert({uneLigne->getId(), *uneLigne});
             m_lignes_par_numero.insert({uneLigne->getNumero(), *uneLigne});
         }
         fichierRoutes.close();
@@ -99,15 +99,16 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
             vStation = string_to_vector(strUneStation, *delim.c_str());
             iStationId = (unsigned int) stoi(vStation[0]);
             sStationNom = vStation[1];
-            sStationNom.erase(sStationNom.begin(), sStationNom.end());
+            sStationNom = sStationNom.substr(1, sStationNom.size() - 2);
 
             sStationDescription = vStation[2];
-            sStationDescription.erase(sStationDescription.begin(), sStationDescription.end());
+            sStationDescription = sStationDescription.substr(1, sStationDescription.size() - 2);
 
             Coordonnees *cStationCoordonees = new Coordonnees(stoi(vStation[3]), stoi(vStation[4]));
             Station *uneStation = new Station(iStationId, sStationNom, sStationDescription, *cStationCoordonees);
-        }
+            m_stations.insert({uneStation->getId(), *uneStation});
 
+        }
         fichierStations.close();
     }else{
         fichierStations.close();
@@ -131,7 +132,40 @@ void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
 {
+// declaration de la variable de type fstream
+    std::fstream fichierServices;
 
+    // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
+    fichierServices.open(p_nomFichier, ios_base :: in);
+    if (!fichierServices.fail()){
+        string strUnService;
+        string delim = ",";
+        vector<string> vService;
+
+        string iServiceId;
+
+        string sDateTemporaire;
+        Date dServiceDate;
+        unsigned int uiServiceExceptionType;
+
+        getline(fichierServices, strUnService);
+        while(getline(fichierServices, strUnService)){
+            vService = string_to_vector(strUnService, *delim.c_str());
+            iServiceId = vService[0];
+
+            dServiceDate = *new Date((unsigned int) stoi(vService[1].substr(0, 4)), (unsigned int) stoi(vService[1].substr(4,2)), (unsigned int) stoi(vService[1].substr(6,2)));
+            uiServiceExceptionType = (unsigned int) stoi(vService[2]);
+
+            if(uiServiceExceptionType == 1){
+                if(dServiceDate == m_date){
+                    m_services.insert(iServiceId);
+                }
+            }
+        }
+        fichierServices.close();
+    }else{
+        fichierServices.close();
+    }
 }
 
 //! \brief ajoute les voyages de la date
@@ -140,7 +174,40 @@ void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 {
+    // declaration de la variable de type fstream
+    std::fstream fichierVoyages;
 
+    // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
+    fichierVoyages.open(p_nomFichier, ios_base :: in);
+    if (!fichierVoyages.fail()){
+        string strUnVoyage;
+        string delim = ",";
+        vector<string> vVoyage;
+
+        string sVoyageId;
+
+        unsigned int uiLigne;
+        string sServiceId;
+        string sDestination;
+
+        getline(fichierVoyages, strUnVoyage);
+        while(getline(fichierVoyages, strUnVoyage)){
+            vVoyage = string_to_vector(strUnVoyage, *delim.c_str());
+            uiLigne = (unsigned int) stoi(vVoyage[0]);
+            sServiceId = vVoyage[1];
+            sVoyageId = vVoyage[2];
+            sDestination = vVoyage[3];
+
+            if(m_services.count(sServiceId) != 0) {
+                Voyage unVoyage = *new Voyage(sVoyageId, uiLigne, sServiceId, sDestination);
+                m_voyages.insert({unVoyage.getId(), unVoyage});
+            }
+
+        }
+        fichierVoyages.close();
+    }else{
+        fichierVoyages.close();
+    }
 }
 
 //! \brief ajoute les arrets aux voyages présents dans le GTFS si l'heure du voyage appartient à l'intervalle de temps du GTFS
@@ -151,7 +218,56 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichier)
 {
+    // declaration de la variable de type fstream
+    std::fstream fichierArretsDeVoyages;
 
+    // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
+    fichierArretsDeVoyages.open(p_nomFichier, ios_base :: in);
+    if (!fichierArretsDeVoyages.fail()){
+        string strUnArretVoyage;
+        string delim = ",";
+        string delimHeures = ":";
+        vector<string> vArret;
+
+        unsigned int uiStationId;       //m_station_id;
+        unsigned int uiNumeroSequence;  //m_numero_sequence;
+
+        Heure hHeureArrivee;    //m_heure_arrivee;
+        Heure hHeureDepart;     //m_heure_depart;
+        string sVoyageId;       //m_voyage_id;
+
+        getline(fichierArretsDeVoyages, strUnArretVoyage);
+        while(getline(fichierArretsDeVoyages, strUnArretVoyage)){
+            vArret = string_to_vector(strUnArretVoyage, *delim.c_str());
+
+            sVoyageId = vArret[0];
+            cout << sVoyageId << endl;
+            hHeureArrivee = *new Heure((unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[2]));
+            hHeureDepart = *new Heure((unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[2]));
+
+            uiStationId = (unsigned int) stoi(vArret[3]);
+            uiNumeroSequence = (unsigned int) stoi(vArret[4]);
+
+            if(hHeureArrivee >= m_now1){
+                if(hHeureDepart <= m_now2){
+                    Arret::Ptr a_ptr = make_shared<Arret>(uiStationId, hHeureArrivee, hHeureDepart, uiNumeroSequence, sVoyageId);
+                    m_voyages[sVoyageId].ajouterArret(a_ptr);
+                }
+            }
+
+        }
+
+        map<string, Voyage>::iterator iterateur;
+        for(iterateur = m_voyages.begin(); iterateur != m_voyages.end(); iterateur++){
+            if(iterateur->second.getNbArrets() == 0){
+                m_voyages.erase(iterateur);
+            }
+        }
+
+        fichierArretsDeVoyages.close();
+    }else{
+        fichierArretsDeVoyages.close();
+    }
 }
 
 unsigned int DonneesGTFS::getNbArrets() const

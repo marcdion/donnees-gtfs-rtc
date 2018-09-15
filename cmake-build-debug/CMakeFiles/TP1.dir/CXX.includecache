@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/etudiant/Bureau/tp1_clion/DonneesGTFS.cpp
+/home/etudiant/Bureau/a2018_tp1algo/DonneesGTFS.cpp
 DonneesGTFS.h
-/home/etudiant/Bureau/tp1_clion/DonneesGTFS.h
+/home/etudiant/Bureau/a2018_tp1algo/DonneesGTFS.h
 
-/home/etudiant/Bureau/tp1_clion/DonneesGTFS.h
+/home/etudiant/Bureau/a2018_tp1algo/DonneesGTFS.h
 string
 -
 vector
@@ -28,33 +28,33 @@ iostream
 sstream
 -
 auxiliaires.h
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 ligne.h
-/home/etudiant/Bureau/tp1_clion/ligne.h
+/home/etudiant/Bureau/a2018_tp1algo/ligne.h
 station.h
-/home/etudiant/Bureau/tp1_clion/station.h
+/home/etudiant/Bureau/a2018_tp1algo/station.h
 voyage.h
-/home/etudiant/Bureau/tp1_clion/voyage.h
+/home/etudiant/Bureau/a2018_tp1algo/voyage.h
 arret.h
-/home/etudiant/Bureau/tp1_clion/arret.h
+/home/etudiant/Bureau/a2018_tp1algo/arret.h
 coordonnees.h
-/home/etudiant/Bureau/tp1_clion/coordonnees.h
+/home/etudiant/Bureau/a2018_tp1algo/coordonnees.h
 
-/home/etudiant/Bureau/tp1_clion/arret.cpp
+/home/etudiant/Bureau/a2018_tp1algo/arret.cpp
 arret.h
-/home/etudiant/Bureau/tp1_clion/arret.h
+/home/etudiant/Bureau/a2018_tp1algo/arret.h
 
-/home/etudiant/Bureau/tp1_clion/arret.h
+/home/etudiant/Bureau/a2018_tp1algo/arret.h
 memory
 -
 auxiliaires.h
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 
-/home/etudiant/Bureau/tp1_clion/auxiliaires.cpp
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.cpp
 auxiliaires.h
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 vector
 -
 string
@@ -66,17 +66,17 @@ iostream
 sstream
 -
 time.h
-/home/etudiant/Bureau/tp1_clion/time.h
+/home/etudiant/Bureau/a2018_tp1algo/time.h
 unordered_set
 -
 algorithm
 -
 
-/home/etudiant/Bureau/tp1_clion/coordonnees.cpp
+/home/etudiant/Bureau/a2018_tp1algo/coordonnees.cpp
 coordonnees.h
-/home/etudiant/Bureau/tp1_clion/coordonnees.h
+/home/etudiant/Bureau/a2018_tp1algo/coordonnees.h
 
-/home/etudiant/Bureau/tp1_clion/coordonnees.h
+/home/etudiant/Bureau/a2018_tp1algo/coordonnees.h
 cmath
 -
 exception
@@ -88,11 +88,11 @@ iostream
 sstream
 -
 
-/home/etudiant/Bureau/tp1_clion/ligne.cpp
+/home/etudiant/Bureau/a2018_tp1algo/ligne.cpp
 ligne.h
-/home/etudiant/Bureau/tp1_clion/ligne.h
+/home/etudiant/Bureau/a2018_tp1algo/ligne.h
 
-/home/etudiant/Bureau/tp1_clion/ligne.h
+/home/etudiant/Bureau/a2018_tp1algo/ligne.h
 string
 -
 vector
@@ -104,11 +104,11 @@ exception
 algorithm
 -
 
-/home/etudiant/Bureau/tp1_clion/station.cpp
+/home/etudiant/Bureau/a2018_tp1algo/station.cpp
 station.h
-/home/etudiant/Bureau/tp1_clion/station.h
+/home/etudiant/Bureau/a2018_tp1algo/station.h
 
-/home/etudiant/Bureau/tp1_clion/station.h
+/home/etudiant/Bureau/a2018_tp1algo/station.h
 string
 -
 vector
@@ -120,17 +120,17 @@ unordered_set
 iostream
 -
 coordonnees.h
-/home/etudiant/Bureau/tp1_clion/coordonnees.h
+/home/etudiant/Bureau/a2018_tp1algo/coordonnees.h
 arret.h
-/home/etudiant/Bureau/tp1_clion/arret.h
+/home/etudiant/Bureau/a2018_tp1algo/arret.h
 auxiliaires.h
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 
-/home/etudiant/Bureau/tp1_clion/voyage.cpp
+/home/etudiant/Bureau/a2018_tp1algo/voyage.cpp
 voyage.h
-/home/etudiant/Bureau/tp1_clion/voyage.h
+/home/etudiant/Bureau/a2018_tp1algo/voyage.h
 
-/home/etudiant/Bureau/tp1_clion/voyage.h
+/home/etudiant/Bureau/a2018_tp1algo/voyage.h
 string
 -
 set
@@ -138,7 +138,7 @@ set
 memory
 -
 arret.h
-/home/etudiant/Bureau/tp1_clion/arret.h
+/home/etudiant/Bureau/a2018_tp1algo/arret.h
 auxiliaires.h
-/home/etudiant/Bureau/tp1_clion/auxiliaires.h
+/home/etudiant/Bureau/a2018_tp1algo/auxiliaires.h
 

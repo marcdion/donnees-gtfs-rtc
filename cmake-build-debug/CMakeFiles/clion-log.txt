@@ -1,4 +1,4 @@
-/home/etudiant/clion-2016.3/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/etudiant/Bureau/tp1_clion
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/etudiant/Bureau/a2018_tp1algo
 -- The C compiler identification is GNU 5.4.0
 -- The CXX compiler identification is GNU 5.4.0
 -- Check for working C compiler: /usr/bin/cc
@@ -15,4 +15,4 @@
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/etudiant/Bureau/tp1_clion/cmake-build-debug
+-- Build files have been written to: /home/etudiant/Bureau/a2018_tp1algo/cmake-build-debug
