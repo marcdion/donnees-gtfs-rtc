@@ -57,11 +57,9 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
         while(getline(fichierRoutes, strUneLigne)){
             vLigne = string_to_vector(strUneLigne, *delim.c_str());
             uiRouteId = (unsigned int) stoi(vLigne[0]);
-            sRouteShortName = vLigne[2];
-            sRouteShortName = sRouteShortName.substr(1, sRouteShortName.size() - 2);
+            sRouteShortName = vLigne[2].substr(1, vLigne[2].size() - 2);
 
-            sRouteDesc = vLigne[4];
-            sRouteDesc = sRouteDesc.substr(1, sRouteDesc.size() - 2);
+            sRouteDesc = vLigne[4].substr(1, vLigne[4].size() - 2);
             sRouteType = Ligne::couleurToCategorie(vLigne[7]);
 
             Ligne *uneLigne = new Ligne(uiRouteId, sRouteShortName, sRouteDesc, sRouteType);
@@ -98,11 +96,9 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
         while(getline(fichierStations, strUneStation)){
             vStation = string_to_vector(strUneStation, *delim.c_str());
             iStationId = (unsigned int) stoi(vStation[0]);
-            sStationNom = vStation[1];
-            sStationNom = sStationNom.substr(1, sStationNom.size() - 2);
+            sStationNom = vStation[1].substr(1, vStation[1].size() - 2);
 
-            sStationDescription = vStation[2];
-            sStationDescription = sStationDescription.substr(1, sStationDescription.size() - 2);
+            sStationDescription = vStation[2].substr(1, vStation[2].size() - 2);
 
             Coordonnees *cStationCoordonees = new Coordonnees(stoi(vStation[3]), stoi(vStation[4]));
             Station *uneStation = new Station(iStationId, sStationNom, sStationDescription, *cStationCoordonees);
@@ -232,6 +228,7 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
         getline(fichierVoyages, strUnVoyage);
         while(getline(fichierVoyages, strUnVoyage)){
             vVoyage = string_to_vector(strUnVoyage, *delim.c_str());
+
             uiLigne = (unsigned int) stoi(vVoyage[0]);
             sServiceId = vVoyage[1];
             sVoyageId = vVoyage[2];
@@ -291,13 +288,15 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
                 uiNumeroSequence = (unsigned int) stoi(vArret[4]);
 
                 if(hHeureDepart >= m_now1){
-                    if(hHeureDepart <= m_now2){
+                    if(hHeureDepart < m_now2){
                         Arret::Ptr a_ptr = make_shared<Arret>(uiStationId, hHeureArrivee, hHeureDepart, uiNumeroSequence, sVoyageId);
                         m_voyages[sVoyageId].ajouterArret(a_ptr);
                         m_stations[uiStationId].addArret(a_ptr);
+
                         nbArrets++;
                     }
                 }
+
             }
         }
 
