@@ -123,7 +123,46 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 //! \throws logic_error si tous les arrets de la date et de l'intervalle n'ont pas été ajoutés
 void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 {
+    if(m_tousLesArretsPresents){
+        // declaration de la variable de type fstream
+        std::fstream fichierTransfers;
 
+        // Overture du fichier p_nomFichier (placé dans la repertoire courant) en lecture binaire.
+        fichierTransfers.open(p_nomFichier, ios_base :: in);
+        if (!fichierTransfers.fail()){
+            string strUnTransfert;
+            string delim = ",";
+            vector<string> vTransfert;
+
+            unsigned int uiFromStationId;
+            unsigned int uiToStationId;
+            unsigned int uiMinTransferTime;
+
+            getline(fichierTransfers, strUnTransfert);
+            while(getline(fichierTransfers, strUnTransfert)){
+                vTransfert = string_to_vector(strUnTransfert, *delim.c_str());
+
+                uiFromStationId = (unsigned int) stoi(vTransfert[0]);
+                uiToStationId = (unsigned int) stoi(vTransfert[1]);
+
+                if(m_stations.count(uiFromStationId) != 0){
+                    if(m_stations.count(uiToStationId) != 0){
+                        if((unsigned int) stoi(vTransfert[3]) == 0){
+                            uiMinTransferTime = 1;
+                        }else{
+                            uiMinTransferTime = (unsigned int) stoi(vTransfert[3]);
+                        }
+
+                        auto tupleTransfert = make_tuple(uiFromStationId, uiToStationId, uiMinTransferTime);
+                        m_transferts.push_back(tupleTransfert);
+                    }
+                }
+            }
+            fichierTransfers.close();
+        }else{
+            fichierTransfers.close();
+        }
+    }
 }
 
 
@@ -198,11 +237,12 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
             sVoyageId = vVoyage[2];
             sDestination = vVoyage[3];
 
+            sDestination = sDestination.substr(1, sDestination.size() - 2);
+
             if(m_services.count(sServiceId) != 0) {
                 Voyage unVoyage = *new Voyage(sVoyageId, uiLigne, sServiceId, sDestination);
                 m_voyages.insert({unVoyage.getId(), unVoyage});
             }
-
         }
         fichierVoyages.close();
     }else{
@@ -231,6 +271,7 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
 
         unsigned int uiStationId;       //m_station_id;
         unsigned int uiNumeroSequence;  //m_numero_sequence;
+        unsigned int nbArrets = 0;
 
         Heure hHeureArrivee;    //m_heure_arrivee;
         Heure hHeureDepart;     //m_heure_depart;
@@ -241,28 +282,43 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
             vArret = string_to_vector(strUnArretVoyage, *delim.c_str());
 
             sVoyageId = vArret[0];
-            cout << sVoyageId << endl;
-            hHeureArrivee = *new Heure((unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[2]));
-            hHeureDepart = *new Heure((unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[2]));
 
-            uiStationId = (unsigned int) stoi(vArret[3]);
-            uiNumeroSequence = (unsigned int) stoi(vArret[4]);
+            if(m_voyages.count(sVoyageId) != 0){
+                hHeureArrivee = *new Heure((unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[2]));
+                hHeureDepart = *new Heure((unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[2]));
 
-            if(hHeureArrivee >= m_now1){
-                if(hHeureDepart <= m_now2){
-                    Arret::Ptr a_ptr = make_shared<Arret>(uiStationId, hHeureArrivee, hHeureDepart, uiNumeroSequence, sVoyageId);
-                    m_voyages[sVoyageId].ajouterArret(a_ptr);
+                uiStationId = (unsigned int) stoi(vArret[3]);
+                uiNumeroSequence = (unsigned int) stoi(vArret[4]);
+
+                if(hHeureDepart >= m_now1){
+                    if(hHeureDepart <= m_now2){
+                        Arret::Ptr a_ptr = make_shared<Arret>(uiStationId, hHeureArrivee, hHeureDepart, uiNumeroSequence, sVoyageId);
+                        m_voyages[sVoyageId].ajouterArret(a_ptr);
+                        m_stations[uiStationId].addArret(a_ptr);
+                        nbArrets++;
+                    }
                 }
             }
-
         }
 
-        map<string, Voyage>::iterator iterateur;
-        for(iterateur = m_voyages.begin(); iterateur != m_voyages.end(); iterateur++){
-            if(iterateur->second.getNbArrets() == 0){
-                m_voyages.erase(iterateur);
+        for (auto it = m_voyages.cbegin(); it != m_voyages.cend();) {
+            if (it->second.getNbArrets() == 0) {
+                it = m_voyages.erase(it);
+            }else{
+                ++it;
             }
         }
+
+        for (auto it = m_stations.cbegin(); it != m_stations.cend();) {
+            if (it->second.getNbArrets() == 0) {
+                it = m_stations.erase(it);
+            }else{
+                ++it;
+            }
+        }
+
+        m_nbArrets = nbArrets;
+        m_tousLesArretsPresents = true;
 
         fichierArretsDeVoyages.close();
     }else{
