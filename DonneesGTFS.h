@@ -1,5 +1,6 @@
 //
 // Created by Mario Marchand on 16-12-29.
+// Modified by Marc-Antoine Dion - 111 179 687
 //
 
 #ifndef TP1_GTFS_H

@@ -1,5 +1,6 @@
 //
 // Created by Mario Marchand on 16-12-29.
+// Modified by Marc-Antoine Dion - 111 179 687
 //
 
 #include "DonneesGTFS.h"
@@ -45,26 +46,28 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
     if (!fichierRoutes.fail()){
         string strUneLigne;
         string delim = ",";
+        string sRouteShortName;
+        string sRouteDesc;
+
+        // Vector string contenant la ligne que nous tentons de lire. Ce vecteur permet
+        // de "splitter" la chaine celon un caractère qui est ","
         vector<string> vLigne;
 
         unsigned int uiRouteId;
 
-        string sRouteShortName;
-        string sRouteDesc;
-        CategorieBus sRouteType;
+        Ligne uneLigne;
 
+        // Ce getline supprime la première ligne du fichier, l'entête, qui n'est pas utile.
         getline(fichierRoutes, strUneLigne);
         while(getline(fichierRoutes, strUneLigne)){
             vLigne = string_to_vector(strUneLigne, *delim.c_str());
             uiRouteId = (unsigned int) stoi(vLigne[0]);
             sRouteShortName = vLigne[2].substr(1, vLigne[2].size() - 2);
-
             sRouteDesc = vLigne[4].substr(1, vLigne[4].size() - 2);
-            sRouteType = Ligne::couleurToCategorie(vLigne[7]);
 
-            Ligne *uneLigne = new Ligne(uiRouteId, sRouteShortName, sRouteDesc, sRouteType);
-            m_lignes.insert({uneLigne->getId(), *uneLigne});
-            m_lignes_par_numero.insert({uneLigne->getNumero(), *uneLigne});
+            uneLigne = Ligne(uiRouteId, sRouteShortName, sRouteDesc, Ligne::couleurToCategorie(vLigne[7]));
+            m_lignes.insert({uneLigne.getId(), uneLigne});
+            m_lignes_par_numero.insert({uneLigne.getNumero(), uneLigne});
         }
         fichierRoutes.close();
     }else{
@@ -92,6 +95,8 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
         string sStationNom;
         string sStationDescription;
 
+        Station uneStation;
+
         getline(fichierStations, strUneStation);
         while(getline(fichierStations, strUneStation)){
             vStation = string_to_vector(strUneStation, *delim.c_str());
@@ -100,9 +105,9 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 
             sStationDescription = vStation[2].substr(1, vStation[2].size() - 2);
 
-            Coordonnees *cStationCoordonees = new Coordonnees(stoi(vStation[3]), stoi(vStation[4]));
-            Station *uneStation = new Station(iStationId, sStationNom, sStationDescription, *cStationCoordonees);
-            m_stations.insert({uneStation->getId(), *uneStation});
+            Coordonnees cStationCoordonees = Coordonnees(stod(vStation[3]), stod(vStation[4]));
+            uneStation = Station(iStationId, sStationNom, sStationDescription, cStationCoordonees);
+            m_stations.insert({uneStation.getId(), uneStation});
 
         }
         fichierStations.close();
@@ -134,6 +139,7 @@ void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
             unsigned int uiToStationId;
             unsigned int uiMinTransferTime;
 
+            // Ce getline supprime la première ligne du fichier, l'entête, qui n'est pas utile.
             getline(fichierTransfers, strUnTransfert);
             while(getline(fichierTransfers, strUnTransfert)){
                 vTransfert = string_to_vector(strUnTransfert, *delim.c_str());
@@ -183,14 +189,17 @@ void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
         Date dServiceDate;
         unsigned int uiServiceExceptionType;
 
+        // Ce getline supprime la première ligne du fichier, l'entête, qui n'est pas utile.
         getline(fichierServices, strUnService);
         while(getline(fichierServices, strUnService)){
             vService = string_to_vector(strUnService, *delim.c_str());
             iServiceId = vService[0];
 
-            dServiceDate = *new Date((unsigned int) stoi(vService[1].substr(0, 4)), (unsigned int) stoi(vService[1].substr(4,2)), (unsigned int) stoi(vService[1].substr(6,2)));
+            // Date d'un service
+            dServiceDate = Date((unsigned int) stoi(vService[1].substr(0, 4)), (unsigned int) stoi(vService[1].substr(4,2)), (unsigned int) stoi(vService[1].substr(6,2)));
             uiServiceExceptionType = (unsigned int) stoi(vService[2]);
 
+            //Nous voulons seulement les services de type 1 et qui correspondent à la date spécifié.
             if(uiServiceExceptionType == 1){
                 if(dServiceDate == m_date){
                     m_services.insert(iServiceId);
@@ -225,6 +234,8 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
         string sServiceId;
         string sDestination;
 
+        Voyage unVoyage;
+
         getline(fichierVoyages, strUnVoyage);
         while(getline(fichierVoyages, strUnVoyage)){
             vVoyage = string_to_vector(strUnVoyage, *delim.c_str());
@@ -237,7 +248,7 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
             sDestination = sDestination.substr(1, sDestination.size() - 2);
 
             if(m_services.count(sServiceId) != 0) {
-                Voyage unVoyage = *new Voyage(sVoyageId, uiLigne, sServiceId, sDestination);
+                unVoyage = Voyage(sVoyageId, uiLigne, sServiceId, sDestination);
                 m_voyages.insert({unVoyage.getId(), unVoyage});
             }
         }
@@ -266,37 +277,31 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
         string delimHeures = ":";
         vector<string> vArret;
 
-        unsigned int uiStationId;       //m_station_id;
-        unsigned int uiNumeroSequence;  //m_numero_sequence;
         unsigned int nbArrets = 0;
 
         Heure hHeureArrivee;    //m_heure_arrivee;
         Heure hHeureDepart;     //m_heure_depart;
-        string sVoyageId;       //m_voyage_id;
+        Arret::Ptr a_ptr;
+
+        vector<string> vHeureDepart;
+        vector<string> vHeureArrivee;
 
         getline(fichierArretsDeVoyages, strUnArretVoyage);
         while(getline(fichierArretsDeVoyages, strUnArretVoyage)){
             vArret = string_to_vector(strUnArretVoyage, *delim.c_str());
 
-            sVoyageId = vArret[0];
+            if(m_voyages.count(vArret[0]) != 0){
+                vHeureDepart = string_to_vector(vArret[2], *delimHeures.c_str());
+                hHeureDepart = Heure((unsigned int) stoi(vHeureDepart[0]), (unsigned int) stoi(vHeureDepart[1]), (unsigned int) stoi(vHeureDepart[2]));
 
-            if(m_voyages.count(sVoyageId) != 0){
-                hHeureArrivee = *new Heure((unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[1], *delimHeures.c_str())[2]));
-                hHeureDepart = *new Heure((unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[0]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[1]), (unsigned int) stoi(string_to_vector(vArret[2], *delimHeures.c_str())[2]));
-
-                uiStationId = (unsigned int) stoi(vArret[3]);
-                uiNumeroSequence = (unsigned int) stoi(vArret[4]);
-
-                if(hHeureDepart >= m_now1){
-                    if(hHeureDepart < m_now2){
-                        Arret::Ptr a_ptr = make_shared<Arret>(uiStationId, hHeureArrivee, hHeureDepart, uiNumeroSequence, sVoyageId);
-                        m_voyages[sVoyageId].ajouterArret(a_ptr);
-                        m_stations[uiStationId].addArret(a_ptr);
-
-                        nbArrets++;
-                    }
+                vHeureArrivee = string_to_vector(vArret[1], *delimHeures.c_str());
+                hHeureArrivee = Heure((unsigned int) stoi(vHeureArrivee[0]), (unsigned int) stoi(vHeureArrivee[1]), (unsigned int) stoi(vHeureArrivee[2]));
+                if(hHeureDepart >= m_now1 && hHeureArrivee < m_now2){
+                    a_ptr = make_shared<Arret>((unsigned int) stoi(vArret[3]), hHeureArrivee, hHeureDepart, (unsigned int) stoi(vArret[4]), vArret[0]);
+                    m_voyages[vArret[0]].ajouterArret(a_ptr);
+                    m_stations[(unsigned int) stoi(vArret[3])].addArret(a_ptr);
+                    ++nbArrets;
                 }
-
             }
         }
 
