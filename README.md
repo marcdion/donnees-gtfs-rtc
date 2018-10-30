@@ -4,14 +4,15 @@ Using General Transit Feed Specification (GTFS) to practice using various C ++ d
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [GTFS](https://en.wikipedia.org/wiki/General_Transit_Feed_Specification) - The data framework used
+* [C++](http://www.cplusplus.com/) - Developpement language
+* [IntelliJ](https://www.jetbrains.com/idea/) - Dev environnement
+* [CMake](https://cmake.org/) - Used to build, test and package the software
 
 ## Authors
 
 * **Mario Marchand** - *Initial work*
-* **Marc-Antoine Dion** - *Initial work*
+* **Marc-Antoine Dion** - *Major contributions*
 
 ## License
 
@@ -19,6 +20,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+* Inspired by the very effective Transit mobile application.
